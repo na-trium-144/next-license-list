@@ -34,7 +34,7 @@ interface IPluginOptions {
 }
 export function withLicense(
   nextConfig: NextConfig,
-  pluginOptions: IPluginOptions,
+  pluginOptions: Partial<IPluginOptions>,
 ) {
   const packageLockJson = readFileSync(
     join(process.cwd(), "package-lock.json"),
