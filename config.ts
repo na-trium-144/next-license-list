@@ -35,7 +35,7 @@ interface IPluginOptions {
 export function withLicense(
   nextConfig: NextConfig,
   pluginOptions: Partial<IPluginOptions>,
-) {
+): NextConfig {
   const packageLockJson = readFileSync(
     join(process.cwd(), "package-lock.json"),
     "utf-8",
