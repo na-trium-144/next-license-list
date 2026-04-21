@@ -1,4 +1,4 @@
-export interface LicenseData {
+export interface LicenseEntry {
   /**
    * package name
    */

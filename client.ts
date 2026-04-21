@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { LicenseData } from "./list.js";
+import type { LicenseEntry } from "./list.js";
 
 export function useLicenses() {
-  const [data, setData] = useState<LicenseData[] | Error | undefined>();
+  const [data, setData] = useState<LicenseEntry[] | Error | undefined>();
   useEffect(() => {
     if (data === undefined) {
       fetch(
@@ -13,7 +13,7 @@ export function useLicenses() {
       )
         .then(async (res) => {
           if (res.ok) {
-            setData((await res.json()) as LicenseData[]);
+            setData((await res.json()) as LicenseEntry[]);
           } else {
             setData(
               new Error(
