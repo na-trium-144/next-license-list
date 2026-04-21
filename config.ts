@@ -62,7 +62,7 @@ export function withLicense(
         config.resolve.alias = {
           ...config.resolve.alias,
           "next-license-list-file": join(
-            dirname(fileURLToPath(import.meta.url)),
+            dirname(dirname(fileURLToPath(import.meta.url))),
             "null.json",
           ),
         };
