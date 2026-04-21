@@ -1,0 +1,5 @@
+/node_modules/
+/*.ts
+*.tgz
+pnpm-lock.yaml
+tsconfig.json
