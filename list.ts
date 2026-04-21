@@ -46,6 +46,8 @@ export function normalizeRepositoryURL(entry: LicenseEntry) {
       url = entry.repository;
     } else if (url.startsWith("git+http")) {
       url = url.slice(4);
+    } else if (url.startsWith("git://")) {
+      url = "https://" + url.slice(6);
     } else if (url.startsWith("git@")) {
       url =
         "https://" +
@@ -53,9 +55,9 @@ export function normalizeRepositoryURL(entry: LicenseEntry) {
           .slice(4)
           .replace(":", "/")
           .replace(/\.git$/, "");
-    } else if (/github:[\w-]+\/[\w-]+/.test(url)) {
+    } else if (/^github:[\w-]+\/[\w-]+$/.test(url)) {
       url = `https://github.com/${url.slice(7)}`;
-    } else if (/[\w-]+\/[\w-]+/.test(url)) {
+    } else if (/^[\w-]+\/[\w-]+$/.test(url)) {
       // assume github username/repository
       url = `https://github.com/${url}`;
     }
