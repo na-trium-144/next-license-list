@@ -64,3 +64,5 @@ export function LicenseListComponent() {
 ```
 
 TODO: これはstatic exportでも使える? その場合 useLicenses() は必要ないのでは?
+
+Additionally, this library automatically corrects the repository URL of each package to a canonical URL that starts with https. This function can be imported as `normalizeRepositoryURL()` and used separately.

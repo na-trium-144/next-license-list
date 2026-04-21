@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { LicenseEntry } from "./list.js";
+import { normalizeRepositoryURL, type LicenseEntry } from "./list.js";
 
 export function useLicenses() {
   const [data, setData] = useState<LicenseEntry[] | Error | undefined>();
@@ -13,7 +13,8 @@ export function useLicenses() {
       )
         .then(async (res) => {
           if (res.ok) {
-            setData((await res.json()) as LicenseEntry[]);
+            const data = (await res.json()) as LicenseEntry[];
+            setData(data.map((e) => normalizeRepositoryURL(e)));
           } else {
             setData(
               new Error(

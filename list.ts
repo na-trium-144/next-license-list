@@ -35,3 +35,31 @@ export interface LicenseEntry {
    */
   noticeText?: string;
 }
+
+/**
+ * Correct the repository URL to a canonical URL that starts with https.
+ */
+export function normalizeRepositoryURL(entry: LicenseEntry) {
+  if (entry.repository) {
+    let url = entry.repository;
+    if (url.startsWith("http")) {
+      url = entry.repository;
+    } else if (url.startsWith("git+http")) {
+      url = url.slice(4);
+    } else if (url.startsWith("git@")) {
+      url =
+        "https://" +
+        url
+          .slice(4)
+          .replace(":", "/")
+          .replace(/\.git$/, "");
+    } else if (/github:[\w-]+\/[\w-]+/.test(url)) {
+      url = `https://github.com/${url.slice(7)}`;
+    } else if (/[\w-]+\/[\w-]+/.test(url)) {
+      // assume github username/repository
+      url = `https://github.com/${url}`;
+    }
+    return { ...entry, repository: url };
+  }
+  return entry;
+}
