@@ -3,7 +3,6 @@ import type { NextConfig } from "next";
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { createHash } from "node:crypto";
-import webpack from "webpack";
 import { fileURLToPath } from "node:url";
 
 interface IPackageLicenseMeta {
@@ -71,11 +70,6 @@ export function withLicense(
               ),
             ),
             ...pluginOptions,
-          }),
-        );
-        config.plugins.push(
-          new webpack.DefinePlugin({
-            NEXT_LICENSE_LIST_HASH: JSON.stringify(hash),
           }),
         );
         config.resolve.alias = {
