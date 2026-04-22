@@ -2,23 +2,16 @@ name: test-next-fixtures
 
 on:
   push:
+    branches:
+      - main
   pull_request:
-  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  server:
+  default:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        project:
-          - name: default
-            port: 3101
-          - name: standalone
-            port: 3102
     defaults:
       run:
         shell: bash
@@ -40,35 +33,106 @@ jobs:
 
       - name: Install fixture deps with local package link
         run: |
-          cd tests/${{ matrix.project.name }}
+          cd tests/default
           pnpm install
           pnpm install ../..
 
       - name: Build fixture
-        run: pnpm --dir tests/${{ matrix.project.name }} build
+        run: pnpm --dir tests/default build
 
       - name: Start fixture server and validate output
         run: |
-          PORT=${{ matrix.project.port }} pnpm --dir tests/${{ matrix.project.name }} start &
+          PORT=3101 pnpm --dir tests/default start &
           server_pid=$!
           trap 'kill $server_pid' EXIT
 
           for i in {1..30}; do
-            if curl -fsS "http://127.0.0.1:${{ matrix.project.port }}/" > /tmp/${{ matrix.project.name }}-page.html; then
+            if curl -fsSo /tmp/default-page.html "http://127.0.0.1:3101/"; then
               break
             fi
             sleep 1
           done
 
-          curl -fsS "http://127.0.0.1:${{ matrix.project.port }}/api/licenses" > /tmp/${{ matrix.project.name }}-route.json
+          curl -fsSo /tmp/default-route.json "http://127.0.0.1:3101/api/licenses"
 
-          grep -q 'next' /tmp/${{ matrix.project.name }}-route.json
-          grep -q 'react' /tmp/${{ matrix.project.name }}-route.json
-          grep -q 'react-dom' /tmp/${{ matrix.project.name }}-route.json
+          echo "=== /api/licenses ==="
+          cat /tmp/default-route.json
 
-          grep -q 'next' /tmp/${{ matrix.project.name }}-page.html
-          grep -q 'react' /tmp/${{ matrix.project.name }}-page.html
-          grep -q 'react-dom' /tmp/${{ matrix.project.name }}-page.html
+          echo "=== / (HTML) ==="
+          cat /tmp/default-page.html
+
+          grep 'next' /tmp/default-route.json
+          grep 'react' /tmp/default-route.json
+          grep 'react-dom' /tmp/default-route.json
+
+          grep 'next' /tmp/default-page.html
+          grep 'react' /tmp/default-page.html
+          grep 'react-dom' /tmp/default-page.html
+
+  standalone:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.1
+
+      - name: Install root deps and build library
+        run: |
+          pnpm install
+          pnpm build
+
+      - name: Install fixture deps with local package link
+        run: |
+          cd tests/standalone
+          pnpm install
+          pnpm install ../..
+
+      - name: Build fixture
+        run: pnpm --dir tests/standalone build
+
+      - name: Copy standalone output and start server
+        run: |
+          cp -r tests/standalone/.next/standalone /tmp/standalone
+          cp -r tests/standalone/.next/static /tmp/standalone/tests/standalone/.next/static
+          if [ -d tests/standalone/public ]; then
+            cp -r tests/standalone/public /tmp/standalone/tests/standalone/public
+          fi
+
+          PORT=3102 node /tmp/standalone/tests/standalone/server.js &
+          server_pid=$!
+          trap 'kill $server_pid' EXIT
+
+          for i in {1..30}; do
+            if curl -fsSo /tmp/standalone-page.html "http://127.0.0.1:3102/"; then
+              break
+            fi
+            sleep 1
+          done
+
+          curl -fsSo /tmp/standalone-route.json "http://127.0.0.1:3102/api/licenses"
+
+          echo "=== /api/licenses ==="
+          cat /tmp/standalone-route.json
+
+          echo "=== / (HTML) ==="
+          cat /tmp/standalone-page.html
+
+          grep 'next' /tmp/standalone-route.json
+          grep 'react' /tmp/standalone-route.json
+          grep 'react-dom' /tmp/standalone-route.json
+
+          grep 'next' /tmp/standalone-page.html
+          grep 'react' /tmp/standalone-page.html
+          grep 'react-dom' /tmp/standalone-page.html
 
   export:
     runs-on: ubuntu-latest
@@ -104,6 +168,10 @@ jobs:
         run: |
           html_file="tests/export/out/index.html"
           test -f "$html_file"
-          grep -q 'next' "$html_file"
-          grep -q 'react' "$html_file"
-          grep -q 'react-dom' "$html_file"
+
+          echo "=== index.html ==="
+          cat "$html_file"
+
+          grep 'next' "$html_file"
+          grep 'react' "$html_file"
+          grep 'react-dom' "$html_file"

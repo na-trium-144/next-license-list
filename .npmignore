@@ -3,3 +3,6 @@
 *.tgz
 pnpm-lock.yaml
 tsconfig.json
+.github
+tests
+generated
