@@ -1,7 +1,7 @@
 import LicensePlugin from "webpack-license-plugin";
 import type { NextConfig } from "next";
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { mkdirSync, readFileSync } from "node:fs";
+import { dirname, join, relative } from "node:path";
 import { createHash } from "node:crypto";
 import webpack from "webpack";
 import { fileURLToPath } from "node:url";
@@ -44,13 +44,25 @@ export function withLicense(
     .update(packageLockJson)
     .digest("hex")
     .slice(0, 8);
+  mkdirSync(
+    join(dirname(dirname(fileURLToPath(import.meta.url))), "licenses"),
+    { recursive: true },
+  );
   return {
     ...nextConfig,
     webpack(config, options) {
       if (!options.isServer) {
         config.plugins.push(
           new LicensePlugin({
-            outputFilename: `static/licenses-${hash}.json`,
+            // node_modulesのこのパッケージのディレクトリに出力し、 "next-license-list/licenses/hash.json" としてimportする
+            outputFilename: relative(
+              config.output.path,
+              join(
+                dirname(dirname(fileURLToPath(import.meta.url))),
+                "licenses",
+                `${hash}.json`,
+              ),
+            ),
             ...pluginOptions,
           }),
         );
@@ -61,6 +73,8 @@ export function withLicense(
         );
         config.resolve.alias = {
           ...config.resolve.alias,
+          // clientのバンドルのビルド時にはまだlicensesファイルが生成されていないので、
+          // nullを返すダミーのファイルにフォールバック
           "next-license-list-file": join(
             dirname(dirname(fileURLToPath(import.meta.url))),
             "null.json",
@@ -77,7 +91,7 @@ export function withLicense(
         config.externals = [
           ...config.externals,
           {
-            "next-license-list-file": `${outputPath}/static/licenses-${hash}.json`,
+            "next-license-list-file": `next-license-list/licenses/${hash}.json`,
           },
         ];
       }

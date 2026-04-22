@@ -10,7 +10,8 @@
     "./config": {
       "types": "./dist/config.d.ts",
       "default": "./dist/config.js"
-    }
+    },
+    "./licenses/*": "./licenses/*"
   },
   "type": "module",
   "scripts": {
@@ -22,12 +23,10 @@
   "packageManager": "pnpm@10.28.1",
   "devDependencies": {
     "@types/node": "^25.6.0",
-    "@types/react": "^19.2.14",
     "next": "^16.2.4",
     "typescript": "^6.0.3"
   },
   "dependencies": {
-    "react": "^19",
     "webpack": "^5",
     "webpack-license-plugin": "^4"
   }
