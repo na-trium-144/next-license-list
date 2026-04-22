@@ -11,7 +11,8 @@
       "types": "./dist/config.d.ts",
       "default": "./dist/config.js"
     },
-    "./licenses/*": "./licenses/*"
+    "./generated/*": "./generated/*",
+    "./null.json": "./null.json"
   },
   "type": "module",
   "scripts": {

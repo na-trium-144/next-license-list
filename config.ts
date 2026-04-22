@@ -52,7 +52,7 @@ export function withLicense(
   }
   const finalHash = hash.digest("hex").slice(0, 8);
   mkdirSync(
-    join(dirname(dirname(fileURLToPath(import.meta.url))), "licenses"),
+    join(dirname(dirname(fileURLToPath(import.meta.url))), "generated"),
     { recursive: true },
   );
   return {
@@ -61,12 +61,12 @@ export function withLicense(
       if (!options.isServer) {
         config.plugins.push(
           new LicensePlugin({
-            // node_modulesのこのパッケージのディレクトリに出力し、 "next-license-list/licenses/hash.json" としてimportする
+            // node_modulesのこのパッケージのディレクトリに出力し、 "next-license-list/generated/hash.json" としてimportする
             outputFilename: relative(
               config.output.path,
               join(
                 dirname(dirname(fileURLToPath(import.meta.url))),
-                "licenses",
+                "generated",
                 `${finalHash}.json`,
               ),
             ),
@@ -82,10 +82,7 @@ export function withLicense(
           ...config.resolve.alias,
           // clientのバンドルのビルド時にはまだlicensesファイルが生成されていないので、
           // nullを返すダミーのファイルにフォールバック
-          "next-license-list-file": join(
-            dirname(dirname(fileURLToPath(import.meta.url))),
-            "null.json",
-          ),
+          "next-license-list-file": "next-license-list/null.json",
         };
       } else {
         let outputPath = config.output.path;
@@ -98,7 +95,7 @@ export function withLicense(
         config.externals = [
           ...config.externals,
           {
-            "next-license-list-file": `next-license-list/licenses/${finalHash}.json`,
+            "next-license-list-file": `next-license-list/generated/${finalHash}.json`,
           },
         ];
       }
