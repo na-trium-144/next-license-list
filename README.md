@@ -12,6 +12,7 @@ Setup `next-license-list` in next.config.js:
 
 ```ts
 import { withLicense } from "next-license-list/config";
+import { fileURLToPath } from "node:url";
 
 const nextConfig = {
   // your config
@@ -21,7 +22,7 @@ export default withLicense(nextConfig, {
   // put additional options for webpack-license-plugin here like:
   includePackages: () =>
     ["tailwindcss", "daisyui"].map((pkg) =>
-      dirname(import.meta.resolve(`${pkg}/package.json`))
+      dirname(fileURLToPath(import.meta.resolve(`${pkg}/package.json`))),
     ),
 });
 ```
