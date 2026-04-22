@@ -1,0 +1,106 @@
+name: test-next-fixtures
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  server:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project:
+          - name: default
+            port: 3101
+          - name: standalone
+            port: 3102
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.1
+
+      - name: Install root deps and build library
+        run: |
+          pnpm install
+          pnpm build
+
+      - name: Install fixture deps with local package link
+        run: |
+          cd tests/${{ matrix.project.name }}
+          pnpm install
+          pnpm install ../..
+
+      - name: Build fixture
+        run: pnpm --dir tests/${{ matrix.project.name }} build --webpack
+
+      - name: Start fixture server and validate output
+        run: |
+          PORT=${{ matrix.project.port }} pnpm --dir tests/${{ matrix.project.name }} start &
+          server_pid=$!
+          trap 'kill $server_pid' EXIT
+
+          for i in {1..30}; do
+            if curl -fsS "http://127.0.0.1:${{ matrix.project.port }}/" > /tmp/${{ matrix.project.name }}-page.html; then
+              break
+            fi
+            sleep 1
+          done
+
+          curl -fsS "http://127.0.0.1:${{ matrix.project.port }}/api/licenses" > /tmp/${{ matrix.project.name }}-route.json
+
+          grep -q 'next' /tmp/${{ matrix.project.name }}-route.json
+          grep -q 'react' /tmp/${{ matrix.project.name }}-route.json
+          grep -q 'react-dom' /tmp/${{ matrix.project.name }}-route.json
+
+          grep -q 'next' /tmp/${{ matrix.project.name }}-page.html
+          grep -q 'react' /tmp/${{ matrix.project.name }}-page.html
+          grep -q 'react-dom' /tmp/${{ matrix.project.name }}-page.html
+
+  export:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.1
+
+      - name: Install root deps and build library
+        run: |
+          pnpm install
+          pnpm build
+
+      - name: Install fixture deps with local package link
+        run: |
+          cd tests/export
+          pnpm install
+          pnpm install ../..
+
+      - name: Build export fixture
+        run: pnpm --dir tests/export build --webpack
+
+      - name: Validate exported HTML
+        run: |
+          html_file="tests/export/out/index.html"
+          test -f "$html_file"
+          grep -q 'next' "$html_file"
+          grep -q 'react' "$html_file"
+          grep -q 'react-dom' "$html_file"
