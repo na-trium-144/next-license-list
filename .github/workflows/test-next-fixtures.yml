@@ -101,6 +101,10 @@ jobs:
 
       - name: Copy standalone output and start server
         run: |
+          # When building in a pnpm workspace rooted at the repo root, Next.js mirrors
+          # the full workspace-relative path inside .next/standalone, so server.js ends
+          # up at .next/standalone/tests/standalone/server.js and static assets must be
+          # placed at .next/standalone/tests/standalone/.next/static.
           cp -r tests/standalone/.next/standalone /tmp/standalone
           cp -r tests/standalone/.next/static /tmp/standalone/tests/standalone/.next/static
           if [ -d tests/standalone/public ]; then

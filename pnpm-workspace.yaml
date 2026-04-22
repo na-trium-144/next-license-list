@@ -1,4 +1,5 @@
 packages:
+  # Next.js test fixture projects
   - tests/default
   - tests/standalone
   - tests/export
