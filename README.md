@@ -1,6 +1,6 @@
 # next-license-list
 
-Get list of third-party package licenses used in Next.js.
+Get list of licenses for third-party packages using in Next.js.
 
 ## Usage
 
@@ -16,14 +16,11 @@ const nextConfig = {
 };
 
 export default withLicense(nextConfig, {
-  /*
-  put additional options for webpack-license-plugin here like:
-
+  // put additional options for webpack-license-plugin here like:
   includePackages: () =>
     ["tailwindcss", "daisyui"].map((pkg) =>
       dirname(import.meta.resolve(`${pkg}/package.json`))
     ),
-  */
 });
 ```
 
@@ -55,14 +52,36 @@ export function LicenseListComponent() {
   return (
     <div>
       <p>This website uses the following third-party packages:</p>
-      <ul>
-        {licenses.map((pkg, i) => <li key={i}>{pkg.name}</li>)}
-      </ul>
+      {Array.isArray(licenses) ? (
+        <ul>
+          {licenses.map((pkg, i) => (
+            <li key={i}>{pkg.name}</li>
+          ))}
+        </ul>
+      ) : licenses ? (
+        // returns Error object on error
+        <p>Error occured: {licenses}</p>
+      ) : (
+        // returns undefined until fetch is done
+        <p>fetching...</p>
+      )}
     </div>
   );
 }
 ```
 
-TODO: これはstatic exportでも使える? その場合 useLicenses() は必要ないのでは?
+Additionally, this library corrects the repository URL of each package to a canonical URL that starts with https. This function can be imported as `normalizeRepositoryURL()` and used separately.
+(`getLicenses()` and `useLicenses()` automatically do this.)
 
-Additionally, this library automatically corrects the repository URL of each package to a canonical URL that starts with https. This function can be imported as `normalizeRepositoryURL()` and used separately.
+```ts
+import { normalizeRepositoryURL, LicenseEntry } from "next-license-list";
+
+const res = await fetch("/my-oss-licenses.json");
+let licenses = await res.json() as LicenseEntry[];
+licenses = licenses.map((e) => normalizeRepositoryURL(e));
+```
+
+## Caveats
+
+- This library only works with webpack. Next.js 16 uses turbopack by default, so please specify `--webpack` option.
+- `getLicenses()` hardcodes the absolute path of the `.next` directory at build time into the server-side bundle. It doesn't work if you move the `.next` directory after building.
