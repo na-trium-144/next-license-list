@@ -42,7 +42,7 @@ jobs:
           pnpm install ../..
 
       - name: Build fixture
-        run: pnpm --dir tests/${{ matrix.project.name }} build --webpack
+        run: pnpm --dir tests/${{ matrix.project.name }} build
 
       - name: Start fixture server and validate output
         run: |
@@ -95,7 +95,7 @@ jobs:
           pnpm install ../..
 
       - name: Build export fixture
-        run: pnpm --dir tests/export build --webpack
+        run: pnpm --dir tests/export build
 
       - name: Validate exported HTML
         run: |
