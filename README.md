@@ -1,12 +1,22 @@
 # next-license-list
 
+[![NPM Version](https://img.shields.io/npm/v/next-license-list)](https://www.npmjs.com/package/next-license-list)
+[![Next.js 13, 14, 15, 16](https://img.shields.io/badge/Next.js-13%20%7C%2014%20%7C%2015%20%7C%2016-blue?logo=nextdotjs)](https://github.com/na-trium-144/next-license-list/actions/workflows/test-next-fixtures.yml)
+[![NPM License](https://img.shields.io/npm/l/next-license-list)](https://github.com/na-trium-144/next-license-list/blob/main/LICENSE)
+
 Get list of licenses for third-party packages using in Next.js.
+
+> [!WARNING]
+> This library only works with webpack. Next.js 16 uses turbopack by default, so please specify `--webpack` option.
 
 ## Usage
 
-This library uses [webpack-license-plugin](https://github.com/codepunkt/webpack-license-plugin) under the hood. Please refer to its README for options and other details.
+Install from npm:
+```bash
+npm install next-license-list
+```
 
-This library only works with webpack. Next.js 16 uses turbopack by default, so please specify `--webpack` option.
+This library uses [webpack-license-plugin](https://github.com/codepunkt/webpack-license-plugin) under the hood. Please refer to its README for options and other details.
 
 Setup `next-license-list` in next.config.js:
 
