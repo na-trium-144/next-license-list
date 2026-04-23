@@ -1,7 +1,15 @@
 {
   "name": "next-license-list",
-  "version": "0.1.0",
-  "description": "",
+  "version": "1.0.0",
+  "description": "Get list of licenses for third-party packages using in Next.js.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/na-trium-144/next-license-list.git"
+  },
+  "bugs": {
+    "url": "https://github.com/na-trium-144/next-license-list/issues"
+  },
+  "homepage": "https://github.com/na-trium-144/next-license-list#readme",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
