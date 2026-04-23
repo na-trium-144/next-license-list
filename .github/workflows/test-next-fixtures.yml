@@ -1,0 +1,220 @@
+name: test-next-fixtures
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  default:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        next: [16, 15, 14, 13]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.1
+
+      - name: Override catalog for Next.js ${{ matrix.next }}
+        if: matrix.next != '16'
+        run: |
+          yq -i '.catalog.next = "^${{ matrix.next }}"' pnpm-workspace.yaml
+          yq -i '.catalog.react = "*"' pnpm-workspace.yaml
+          yq -i '.catalog["react-dom"] = "*"' pnpm-workspace.yaml
+          yq -i '.catalog["@types/react"] = "*"' pnpm-workspace.yaml
+          yq -i '.catalog["@types/react-dom"] = "*"' pnpm-workspace.yaml
+          yq -i '.catalog["eslint-config-next"] = "^${{ matrix.next }}"' pnpm-workspace.yaml
+
+      - name: Remove --webpack flag for next build
+        if: matrix.next == '13' || matrix.next == '14' || matrix.next == '15'
+        run: |
+          jq '.scripts.build = "next build"' tests/default/package.json > /tmp/pkg.json && mv /tmp/pkg.json tests/default/package.json
+
+      - name: Install deps and build library
+        run: |
+          pnpm install --no-frozen-lockfile
+          pnpm build
+
+      - name: Build fixture
+        run: pnpm --dir tests/default build
+
+      - name: Start fixture server and validate output
+        run: |
+          PORT=3101 pnpm --dir tests/default start &
+          server_pid=$!
+          trap 'kill $server_pid' EXIT
+
+          for i in {1..30}; do
+            if curl -fsSo /tmp/default-page.html "http://127.0.0.1:3101/"; then
+              break
+            fi
+            sleep 1
+          done
+
+          curl -fsSo /tmp/default-route.json "http://127.0.0.1:3101/api/licenses"
+
+          echo "=== /api/licenses ==="
+          cat /tmp/default-route.json
+
+          echo "=== / (HTML) ==="
+          cat /tmp/default-page.html
+
+          grep 'next' /tmp/default-route.json
+          grep 'react' /tmp/default-route.json
+          grep 'react-dom' /tmp/default-route.json
+
+          grep 'next' /tmp/default-page.html
+          grep 'react' /tmp/default-page.html
+          grep 'react-dom' /tmp/default-page.html
+
+  standalone:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        next: [16, 15, 14, 13]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.1
+
+      - name: Override catalog for Next.js ${{ matrix.next }}
+        if: matrix.next != '16'
+        run: |
+          yq -i '.catalog.next = "^${{ matrix.next }}"' pnpm-workspace.yaml
+          yq -i '.catalog.react = "*"' pnpm-workspace.yaml
+          yq -i '.catalog["react-dom"] = "*"' pnpm-workspace.yaml
+          yq -i '.catalog["@types/react"] = "*"' pnpm-workspace.yaml
+          yq -i '.catalog["@types/react-dom"] = "*"' pnpm-workspace.yaml
+          yq -i '.catalog["eslint-config-next"] = "^${{ matrix.next }}"' pnpm-workspace.yaml
+
+      - name: Remove --webpack flag for next build
+        if: matrix.next == '13' || matrix.next == '14' || matrix.next == '15'
+        run: |
+          jq '.scripts.build = "next build"' tests/standalone/package.json > /tmp/pkg.json && mv /tmp/pkg.json tests/standalone/package.json
+
+      - name: Install deps and build library
+        run: |
+          pnpm install --no-frozen-lockfile
+          pnpm build
+
+      - name: Build fixture
+        run: pnpm --dir tests/standalone build
+
+      - name: Copy standalone output and start server
+        run: |
+          # When building in a pnpm workspace rooted at the repo root, Next.js mirrors
+          # the full workspace-relative path inside .next/standalone, so server.js ends
+          # up at .next/standalone/tests/standalone/server.js and static assets must be
+          # placed at .next/standalone/tests/standalone/.next/static.
+          cp -r tests/standalone/.next/standalone /tmp/standalone
+          cp -r tests/standalone/.next/static /tmp/standalone/tests/standalone/.next/static
+          if [ -d tests/standalone/public ]; then
+            cp -r tests/standalone/public /tmp/standalone/tests/standalone/public
+          fi
+
+          PORT=3102 node /tmp/standalone/tests/standalone/server.js &
+          server_pid=$!
+          trap 'kill $server_pid' EXIT
+
+          for i in {1..30}; do
+            if curl -fsSo /tmp/standalone-page.html "http://127.0.0.1:3102/"; then
+              break
+            fi
+            sleep 1
+          done
+
+          curl -fsSo /tmp/standalone-route.json "http://127.0.0.1:3102/api/licenses"
+
+          echo "=== /api/licenses ==="
+          cat /tmp/standalone-route.json
+
+          echo "=== / (HTML) ==="
+          cat /tmp/standalone-page.html
+
+          grep 'next' /tmp/standalone-route.json
+          grep 'react' /tmp/standalone-route.json
+          grep 'react-dom' /tmp/standalone-route.json
+
+          grep 'next' /tmp/standalone-page.html
+          grep 'react' /tmp/standalone-page.html
+          grep 'react-dom' /tmp/standalone-page.html
+
+  export:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        next: [16, 15, 14, 13]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.1
+
+      - name: Override catalog for Next.js ${{ matrix.next }}
+        if: matrix.next != '16'
+        run: |
+          yq -i '.catalog.next = "^${{ matrix.next }}"' pnpm-workspace.yaml
+          yq -i '.catalog.react = "*"' pnpm-workspace.yaml
+          yq -i '.catalog["react-dom"] = "*"' pnpm-workspace.yaml
+          yq -i '.catalog["@types/react"] = "*"' pnpm-workspace.yaml
+          yq -i '.catalog["@types/react-dom"] = "*"' pnpm-workspace.yaml
+          yq -i '.catalog["eslint-config-next"] = "^${{ matrix.next }}"' pnpm-workspace.yaml
+
+      - name: Remove --webpack flag for next build
+        if: matrix.next == '13' || matrix.next == '14' || matrix.next == '15'
+        run: |
+          jq '.scripts.build = "next build"' tests/export/package.json > /tmp/pkg.json && mv /tmp/pkg.json tests/export/package.json
+
+      - name: Install deps and build library
+        run: |
+          pnpm install --no-frozen-lockfile
+          pnpm build
+
+      - name: Build export fixture
+        run: pnpm --dir tests/export build
+
+      - name: Validate exported HTML
+        run: |
+          html_file="tests/export/out/index.html"
+          test -f "$html_file"
+
+          echo "=== index.html ==="
+          cat "$html_file"
+
+          grep 'next' "$html_file"
+          grep 'react' "$html_file"
+          grep 'react-dom' "$html_file"
