@@ -4,6 +4,27 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@types/react':
+      specifier: ^19
+      version: 19.2.14
+    '@types/react-dom':
+      specifier: ^19
+      version: 19.2.3
+    eslint-config-next:
+      specifier: 16.2.4
+      version: 16.2.4
+    next:
+      specifier: 16.2.4
+      version: 16.2.4
+    react:
+      specifier: 19.2.4
+      version: 19.2.4
+    react-dom:
+      specifier: 19.2.4
+      version: 19.2.4
+
 importers:
 
   .:
@@ -25,16 +46,16 @@ importers:
   tests/default:
     dependencies:
       next:
-        specifier: 16.2.4
+        specifier: 'catalog:'
         version: 16.2.4(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       next-license-list:
         specifier: link:../..
         version: link:../..
       react:
-        specifier: 19.2.4
+        specifier: 'catalog:'
         version: 19.2.4
       react-dom:
-        specifier: 19.2.4
+        specifier: 'catalog:'
         version: 19.2.4(react@19.2.4)
     devDependencies:
       '@tailwindcss/postcss':
@@ -44,16 +65,16 @@ importers:
         specifier: ^20
         version: 20.19.39
       '@types/react':
-        specifier: ^19
+        specifier: 'catalog:'
         version: 19.2.14
       '@types/react-dom':
-        specifier: ^19
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.14)
       eslint:
         specifier: ^9
         version: 9.39.4(jiti@2.6.1)
       eslint-config-next:
-        specifier: 16.2.4
+        specifier: 'catalog:'
         version: 16.2.4(@typescript-eslint/parser@8.59.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
       tailwindcss:
         specifier: ^4
@@ -65,16 +86,16 @@ importers:
   tests/export:
     dependencies:
       next:
-        specifier: 16.2.4
+        specifier: 'catalog:'
         version: 16.2.4(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       next-license-list:
         specifier: link:../..
         version: link:../..
       react:
-        specifier: 19.2.4
+        specifier: 'catalog:'
         version: 19.2.4
       react-dom:
-        specifier: 19.2.4
+        specifier: 'catalog:'
         version: 19.2.4(react@19.2.4)
     devDependencies:
       '@tailwindcss/postcss':
@@ -84,16 +105,16 @@ importers:
         specifier: ^20
         version: 20.19.39
       '@types/react':
-        specifier: ^19
+        specifier: 'catalog:'
         version: 19.2.14
       '@types/react-dom':
-        specifier: ^19
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.14)
       eslint:
         specifier: ^9
         version: 9.39.4(jiti@2.6.1)
       eslint-config-next:
-        specifier: 16.2.4
+        specifier: 'catalog:'
         version: 16.2.4(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
       tailwindcss:
         specifier: ^4
@@ -105,16 +126,16 @@ importers:
   tests/standalone:
     dependencies:
       next:
-        specifier: 16.2.4
+        specifier: 'catalog:'
         version: 16.2.4(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       next-license-list:
         specifier: link:../..
         version: link:../..
       react:
-        specifier: 19.2.4
+        specifier: 'catalog:'
         version: 19.2.4
       react-dom:
-        specifier: 19.2.4
+        specifier: 'catalog:'
         version: 19.2.4(react@19.2.4)
     devDependencies:
       '@tailwindcss/postcss':
@@ -124,16 +145,16 @@ importers:
         specifier: ^20
         version: 20.19.39
       '@types/react':
-        specifier: ^19
+        specifier: 'catalog:'
         version: 19.2.14
       '@types/react-dom':
-        specifier: ^19
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.14)
       eslint:
         specifier: ^9
         version: 9.39.4(jiti@2.6.1)
       eslint-config-next:
-        specifier: 16.2.4
+        specifier: 'catalog:'
         version: 16.2.4(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
       tailwindcss:
         specifier: ^4

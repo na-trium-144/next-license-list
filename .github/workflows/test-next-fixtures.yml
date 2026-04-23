@@ -12,6 +12,38 @@ permissions:
 jobs:
   default:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - next_version: "16"
+            next: "16.2.4"
+            react: "19.2.4"
+            react_dom: "19.2.4"
+            types_react: "^19"
+            types_react_dom: "^19"
+            eslint_config_next: "16.2.4"
+          - next_version: "15"
+            next: "^15"
+            react: "^19"
+            react_dom: "^19"
+            types_react: "^19"
+            types_react_dom: "^19"
+            eslint_config_next: "^15"
+          - next_version: "14"
+            next: "^14"
+            react: "^18"
+            react_dom: "^18"
+            types_react: "^18"
+            types_react_dom: "^18"
+            eslint_config_next: "^14"
+          - next_version: "13"
+            next: "^13"
+            react: "^18"
+            react_dom: "^18"
+            types_react: "^18"
+            types_react_dom: "^18"
+            eslint_config_next: "^13"
     defaults:
       run:
         shell: bash
@@ -26,15 +58,29 @@ jobs:
         with:
           version: 10.28.1
 
+      - name: Override catalog for Next.js ${{ matrix.next_version }}
+        run: |
+          yq -i '.catalog.next = "${{ matrix.next }}"' pnpm-workspace.yaml
+          yq -i '.catalog.react = "${{ matrix.react }}"' pnpm-workspace.yaml
+          yq -i '.catalog["react-dom"] = "${{ matrix.react_dom }}"' pnpm-workspace.yaml
+          yq -i '.catalog["@types/react"] = "${{ matrix.types_react }}"' pnpm-workspace.yaml
+          yq -i '.catalog["@types/react-dom"] = "${{ matrix.types_react_dom }}"' pnpm-workspace.yaml
+          yq -i '.catalog["eslint-config-next"] = "${{ matrix.eslint_config_next }}"' pnpm-workspace.yaml
+
+      - name: Remove --webpack flag for Next.js ${{ matrix.next_version }}
+        if: matrix.next_version == '13' || matrix.next_version == '14'
+        run: |
+          jq '.scripts.build = "next build"' tests/default/package.json > /tmp/pkg.json && mv /tmp/pkg.json tests/default/package.json
+
       - name: Install root deps and build library
         run: |
-          pnpm install
+          pnpm install --no-frozen-lockfile
           pnpm build
 
       - name: Install fixture deps with local package link
         run: |
           cd tests/default
-          pnpm install
+          pnpm install --no-frozen-lockfile
           pnpm install ../..
 
       - name: Build fixture
@@ -71,6 +117,38 @@ jobs:
 
   standalone:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - next_version: "16"
+            next: "16.2.4"
+            react: "19.2.4"
+            react_dom: "19.2.4"
+            types_react: "^19"
+            types_react_dom: "^19"
+            eslint_config_next: "16.2.4"
+          - next_version: "15"
+            next: "^15"
+            react: "^19"
+            react_dom: "^19"
+            types_react: "^19"
+            types_react_dom: "^19"
+            eslint_config_next: "^15"
+          - next_version: "14"
+            next: "^14"
+            react: "^18"
+            react_dom: "^18"
+            types_react: "^18"
+            types_react_dom: "^18"
+            eslint_config_next: "^14"
+          - next_version: "13"
+            next: "^13"
+            react: "^18"
+            react_dom: "^18"
+            types_react: "^18"
+            types_react_dom: "^18"
+            eslint_config_next: "^13"
     defaults:
       run:
         shell: bash
@@ -85,15 +163,29 @@ jobs:
         with:
           version: 10.28.1
 
+      - name: Override catalog for Next.js ${{ matrix.next_version }}
+        run: |
+          yq -i '.catalog.next = "${{ matrix.next }}"' pnpm-workspace.yaml
+          yq -i '.catalog.react = "${{ matrix.react }}"' pnpm-workspace.yaml
+          yq -i '.catalog["react-dom"] = "${{ matrix.react_dom }}"' pnpm-workspace.yaml
+          yq -i '.catalog["@types/react"] = "${{ matrix.types_react }}"' pnpm-workspace.yaml
+          yq -i '.catalog["@types/react-dom"] = "${{ matrix.types_react_dom }}"' pnpm-workspace.yaml
+          yq -i '.catalog["eslint-config-next"] = "${{ matrix.eslint_config_next }}"' pnpm-workspace.yaml
+
+      - name: Remove --webpack flag for Next.js ${{ matrix.next_version }}
+        if: matrix.next_version == '13' || matrix.next_version == '14'
+        run: |
+          jq '.scripts.build = "next build"' tests/standalone/package.json > /tmp/pkg.json && mv /tmp/pkg.json tests/standalone/package.json
+
       - name: Install root deps and build library
         run: |
-          pnpm install
+          pnpm install --no-frozen-lockfile
           pnpm build
 
       - name: Install fixture deps with local package link
         run: |
           cd tests/standalone
-          pnpm install
+          pnpm install --no-frozen-lockfile
           pnpm install ../..
 
       - name: Build fixture
@@ -140,6 +232,38 @@ jobs:
 
   export:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - next_version: "16"
+            next: "16.2.4"
+            react: "19.2.4"
+            react_dom: "19.2.4"
+            types_react: "^19"
+            types_react_dom: "^19"
+            eslint_config_next: "16.2.4"
+          - next_version: "15"
+            next: "^15"
+            react: "^19"
+            react_dom: "^19"
+            types_react: "^19"
+            types_react_dom: "^19"
+            eslint_config_next: "^15"
+          - next_version: "14"
+            next: "^14"
+            react: "^18"
+            react_dom: "^18"
+            types_react: "^18"
+            types_react_dom: "^18"
+            eslint_config_next: "^14"
+          - next_version: "13"
+            next: "^13"
+            react: "^18"
+            react_dom: "^18"
+            types_react: "^18"
+            types_react_dom: "^18"
+            eslint_config_next: "^13"
     defaults:
       run:
         shell: bash
@@ -154,15 +278,29 @@ jobs:
         with:
           version: 10.28.1
 
+      - name: Override catalog for Next.js ${{ matrix.next_version }}
+        run: |
+          yq -i '.catalog.next = "${{ matrix.next }}"' pnpm-workspace.yaml
+          yq -i '.catalog.react = "${{ matrix.react }}"' pnpm-workspace.yaml
+          yq -i '.catalog["react-dom"] = "${{ matrix.react_dom }}"' pnpm-workspace.yaml
+          yq -i '.catalog["@types/react"] = "${{ matrix.types_react }}"' pnpm-workspace.yaml
+          yq -i '.catalog["@types/react-dom"] = "${{ matrix.types_react_dom }}"' pnpm-workspace.yaml
+          yq -i '.catalog["eslint-config-next"] = "${{ matrix.eslint_config_next }}"' pnpm-workspace.yaml
+
+      - name: Remove --webpack flag for Next.js ${{ matrix.next_version }}
+        if: matrix.next_version == '13' || matrix.next_version == '14'
+        run: |
+          jq '.scripts.build = "next build"' tests/export/package.json > /tmp/pkg.json && mv /tmp/pkg.json tests/export/package.json
+
       - name: Install root deps and build library
         run: |
-          pnpm install
+          pnpm install --no-frozen-lockfile
           pnpm build
 
       - name: Install fixture deps with local package link
         run: |
           cd tests/export
-          pnpm install
+          pnpm install --no-frozen-lockfile
           pnpm install ../..
 
       - name: Build export fixture

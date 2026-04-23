@@ -1,7 +1,7 @@
-import type { NextConfig } from "next";
 import { withLicense } from "next-license-list/config";
 
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   output: "export",
 };
 

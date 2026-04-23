@@ -1,8 +1,6 @@
-import type { NextConfig } from "next";
 import { withLicense } from "next-license-list/config";
 
-const nextConfig: NextConfig = {
-  output: "standalone",
-};
+/** @type {import('next').NextConfig} */
+const nextConfig = {};
 
 export default withLicense(nextConfig, {});
