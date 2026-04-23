@@ -1,8 +1,9 @@
 /node_modules/
+/.github/
+/tests/
+/generated/
 /*.ts
 *.tgz
 pnpm-lock.yaml
+pnpm-workspace.yaml
 tsconfig.json
-.github
-tests
-generated
