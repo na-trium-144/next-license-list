@@ -30,9 +30,9 @@
   "license": "0BSD",
   "packageManager": "pnpm@10.28.1",
   "devDependencies": {
-    "@types/node": "catalog:",
-    "next": "catalog:",
-    "typescript": "catalog:"
+    "@types/node": "^25",
+    "next": "^16",
+    "typescript": "^5"
   },
   "dependencies": {
     "webpack-license-plugin": "^4"
