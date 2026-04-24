@@ -6,10 +6,16 @@
 
 Get list of licenses for third-party packages using in Next.js.
 
-> [!WARNING]
-> This library only works with webpack. Next.js 16 uses turbopack by default, so please specify `--webpack` option.
+## Why
+
+In modern web development using frameworks like Next.js, you include a vast number of licenses (such as MIT and Apache) behind the scenes, in addition to the code you write. These often include the condition that **"the copyright notice and the full license text must be included in the distribution."** For websites, since the browser downloads and executes the JS file, this constitutes "software distribution."
+
+This library allows you to easily retrieve the license information (including name, source code URL, and license text) for all libraries included in the client-side bundle of a website built with Next.js. Unlike other tools that simply output as txt or json files, this library allows you to **format and display the license information** within your website to match your website's style.
 
 ## Usage
+
+> [!WARNING]
+> This library only works with webpack. Next.js 16 uses turbopack by default, so please specify `--webpack` option.
 
 Install from npm:
 ```bash
