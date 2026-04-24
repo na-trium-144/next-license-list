@@ -30,7 +30,8 @@ jobs:
         with:
           version: 10.28.1
 
-      - name: Override catalog for Next.js ${{ matrix.next }}
+      - &override_catalog
+        name: Override catalog for Next.js ${{ matrix.next }}
         if: matrix.next != '16'
         run: |
           yq -i '.catalog.next = "^${{ matrix.next }}"' pnpm-workspace.yaml
@@ -40,12 +41,16 @@ jobs:
           yq -i '.catalog["@types/react-dom"] = "*"' pnpm-workspace.yaml
           yq -i '.catalog["eslint-config-next"] = "^${{ matrix.next }}"' pnpm-workspace.yaml
 
-      - name: Remove --webpack flag for next build
+      - &remove_webpack
+        name: Remove --webpack flag for next build
         if: matrix.next == '13' || matrix.next == '14' || matrix.next == '15'
         run: |
-          jq '.scripts.build = "next build"' tests/default/package.json > /tmp/pkg.json && mv /tmp/pkg.json tests/default/package.json
+          for f in tests/*/package.json; do
+            jq '.scripts.build = "next build"' $f > /tmp/pkg.json && mv /tmp/pkg.json $f
+          done
 
-      - name: Install deps and build library
+      - &install
+        name: Install deps and build library
         run: |
           pnpm install --no-frozen-lockfile
           pnpm build
@@ -102,25 +107,9 @@ jobs:
         with:
           version: 10.28.1
 
-      - name: Override catalog for Next.js ${{ matrix.next }}
-        if: matrix.next != '16'
-        run: |
-          yq -i '.catalog.next = "^${{ matrix.next }}"' pnpm-workspace.yaml
-          yq -i '.catalog.react = "*"' pnpm-workspace.yaml
-          yq -i '.catalog["react-dom"] = "*"' pnpm-workspace.yaml
-          yq -i '.catalog["@types/react"] = "*"' pnpm-workspace.yaml
-          yq -i '.catalog["@types/react-dom"] = "*"' pnpm-workspace.yaml
-          yq -i '.catalog["eslint-config-next"] = "^${{ matrix.next }}"' pnpm-workspace.yaml
-
-      - name: Remove --webpack flag for next build
-        if: matrix.next == '13' || matrix.next == '14' || matrix.next == '15'
-        run: |
-          jq '.scripts.build = "next build"' tests/standalone/package.json > /tmp/pkg.json && mv /tmp/pkg.json tests/standalone/package.json
-
-      - name: Install deps and build library
-        run: |
-          pnpm install --no-frozen-lockfile
-          pnpm build
+      - *override_catalog
+      - *remove_webpack
+      - *install
 
       - name: Build fixture
         run: pnpm --dir tests/standalone build
@@ -184,25 +173,9 @@ jobs:
         with:
           version: 10.28.1
 
-      - name: Override catalog for Next.js ${{ matrix.next }}
-        if: matrix.next != '16'
-        run: |
-          yq -i '.catalog.next = "^${{ matrix.next }}"' pnpm-workspace.yaml
-          yq -i '.catalog.react = "*"' pnpm-workspace.yaml
-          yq -i '.catalog["react-dom"] = "*"' pnpm-workspace.yaml
-          yq -i '.catalog["@types/react"] = "*"' pnpm-workspace.yaml
-          yq -i '.catalog["@types/react-dom"] = "*"' pnpm-workspace.yaml
-          yq -i '.catalog["eslint-config-next"] = "^${{ matrix.next }}"' pnpm-workspace.yaml
-
-      - name: Remove --webpack flag for next build
-        if: matrix.next == '13' || matrix.next == '14' || matrix.next == '15'
-        run: |
-          jq '.scripts.build = "next build"' tests/export/package.json > /tmp/pkg.json && mv /tmp/pkg.json tests/export/package.json
-
-      - name: Install deps and build library
-        run: |
-          pnpm install --no-frozen-lockfile
-          pnpm build
+      - *override_catalog
+      - *remove_webpack
+      - *install
 
       - name: Build export fixture
         run: pnpm --dir tests/export build
