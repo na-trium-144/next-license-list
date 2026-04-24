@@ -1,6 +1,6 @@
 {
   "name": "next-license-list",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Get list of licenses for third-party packages using in Next.js.",
   "keywords": [
     "webpack",
