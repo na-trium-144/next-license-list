@@ -2,6 +2,21 @@
   "name": "next-license-list",
   "version": "1.0.0",
   "description": "Get list of licenses for third-party packages using in Next.js.",
+  "keywords": [
+    "webpack",
+    "nextjs",
+    "next.js",
+    "build",
+    "oss",
+    "open source",
+    "compliance",
+    "copyright",
+    "license",
+    "licence",
+    "licenses",
+    "licences",
+    "plugin"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/na-trium-144/next-license-list.git"
